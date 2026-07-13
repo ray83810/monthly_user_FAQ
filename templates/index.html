@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>每月案件問題整理工具</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="background-decor decor-1"></div>
+    <div class="background-decor decor-2"></div>
+    <div class="background-decor decor-3"></div>
+
+    <div class="container">
+        <header class="app-header">
+            <div class="logo">
+                <i class="fa-solid fa-file-excel gradient-text"></i>
+                <span class="gradient-text font-weight-bold">Asurion</span>
+            </div>
+            <h1>每月案件問題整理工具</h1>
+            <p class="subtitle">自動篩選、解析並爬取網頁參考資料，產生符合格式樣式的案件整理報表</p>
+        </header>
+
+        <main class="main-card">
+            <!-- Dropzone Area -->
+            <div id="dropzone" class="upload-zone">
+                <input type="file" id="file-input" accept=".xlsx" class="hidden-file-input">
+                <div class="upload-icon">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <h3>拖放報表檔案至此處</h3>
+                <p class="upload-desc">或點擊此區域選擇 Excel 檔案 (.xlsx)</p>
+                <div class="requirements">
+                    <span class="requirement-tag"><i class="fa-solid fa-filter"></i> RESOLVED 案件</span>
+                    <span class="requirement-tag"><i class="fa-solid fa-ban"></i> 排除 SUR 類型</span>
+                </div>
+            </div>
+
+            <!-- Selected File Info -->
+            <div id="file-info" class="file-info-container hidden">
+                <div class="file-details">
+                    <i class="fa-regular fa-file-excel file-icon"></i>
+                    <div class="file-text">
+                        <span id="file-name" class="file-name">filename.xlsx</span>
+                        <span id="file-size" class="file-size">0 KB</span>
+                    </div>
+                    <button id="cancel-btn" class="icon-btn" title="取消選擇"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <button id="process-btn" class="btn btn-primary">
+                    <i class="fa-solid fa-bolt"></i> 開始整理報表
+                </button>
+            </div>
+
+            <!-- Progress State -->
+            <div id="progress-container" class="progress-container hidden">
+                <div class="progress-header">
+                    <span id="progress-status" class="progress-status">正在上傳檔案...</span>
+                    <span id="progress-percentage" class="progress-percentage">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%"></div>
+                </div>
+                <p id="progress-detail" class="progress-detail">請勿關閉網頁，系統正在進行資料過濾、解析與網路搜尋...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="error-container" class="error-container hidden">
+                <i class="fa-solid fa-triangle-exclamation error-icon"></i>
+                <div class="error-content">
+                    <h4>處理失敗</h4>
+                    <p id="error-message">發生未知錯誤，請重試。</p>
+                </div>
+                <button id="retry-btn" class="btn btn-outline">重新上傳</button>
+            </div>
+
+            <!-- Download Result -->
+            <div id="result-container" class="result-container hidden">
+                <div class="success-icon animate-bounce">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h3>處理完成！</h3>
+                <p id="result-summary">共篩選並處理了 70 筆 RESOLVED 案件，已補上相關補充連結。</p>
+                
+                <div class="actions">
+                    <a id="download-link" href="#" class="btn btn-success" download>
+                        <i class="fa-solid fa-file-arrow-down"></i> 下載整理成品
+                    </a>
+                    <button id="reset-btn" class="btn btn-outline">
+                        <i class="fa-solid fa-arrow-rotate-left"></i> 處理下一份報表
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p>&copy; 2026 Asurion Taiwan Call Center. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

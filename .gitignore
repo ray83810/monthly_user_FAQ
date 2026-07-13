@@ -1,0 +1,9 @@
+*.xlsx
+uploads/
+downloads/
+__pycache__/
+.venv/
+.idea/
+.vscode/
+*.pyc
+*.log
