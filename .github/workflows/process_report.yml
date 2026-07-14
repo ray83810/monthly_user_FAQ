@@ -30,20 +30,31 @@ jobs:
 
     - name: Process Excel File
       run: |
+        # Use nullglob to safely check for Excel files
+        shopt -s nullglob
+        FILES=(uploads/*.xlsx)
+        if [ ${#FILES[@]} -eq 0 ]; then
+          echo "No Excel files found in uploads/ folder. Skipping processing."
+          exit 0
+        fi
+        
         # Find the latest .xlsx file inside uploads/ directory
         INPUT_FILE=$(ls -t uploads/*.xlsx | head -n 1)
-        if [ -z "$INPUT_FILE" ]; then
-          echo "No Excel file found in uploads/ folder!"
-          exit 1
-        fi
         echo "Processing file: $INPUT_FILE"
         python app.py "$INPUT_FILE"
 
     - name: Commit and Push Results
       run: |
+        # Only run if results were generated
+        if [ ! -d "downloads" ] || [ -z "$(ls -A downloads 2>/dev/null)" ]; then
+          echo "No output files generated. Skipping push."
+          exit 0
+        fi
+        
         git config --local user.name "github-actions[bot]"
         git config --local user.email "github-actions[bot]@users.noreply.github.com"
         mkdir -p results
+        
         # Copy the processed excel report to results/
         cp downloads/*.xlsx results/
         git add results/
