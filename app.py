@@ -18,8 +18,13 @@ app = Flask(__name__)
 
 # Config folders
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
-DOWNLOAD_FOLDER = os.path.join(BASE_DIR, 'downloads')
+if os.environ.get('VERCEL') or os.environ.get('RENDER') or not os.access(BASE_DIR, os.W_OK):
+    UPLOAD_FOLDER = '/tmp/uploads'
+    DOWNLOAD_FOLDER = '/tmp/downloads'
+else:
+    UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
+    DOWNLOAD_FOLDER = os.path.join(BASE_DIR, 'downloads')
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
@@ -659,5 +664,5 @@ def download_file(filename):
     return send_from_directory(DOWNLOAD_FOLDER, filename, as_attachment=True)
 
 if __name__ == '__main__':
-    # Change port or host if needed
-    app.run(host='127.0.0.1', port=5000, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
