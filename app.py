@@ -664,5 +664,34 @@ def download_file(filename):
     return send_from_directory(DOWNLOAD_FOLDER, filename, as_attachment=True)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    import sys
+    if len(sys.argv) > 1:
+        # CLI Mode: python app.py <input_file_path>
+        input_path = sys.argv[1]
+        print(f"Starting CLI processing for: {input_path}")
+        
+        # Ensure folders exist
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
+        
+        # Mock task dictionary for CLI task
+        tasks['cli'] = {
+            'status': 'pending',
+            'progress': 0,
+            'detail': '',
+            'result_file': None,
+            'error_msg': None,
+            'total_cases': 0
+        }
+        process_file_task('cli', input_path)
+        print("Processing finished!")
+        status = tasks['cli']['status']
+        print(f"Status: {status}")
+        if status == 'success':
+            print(f"Generated result file: {tasks['cli']['result_file']}")
+        else:
+            print(f"Error: {tasks['cli']['error_msg']}")
+            sys.exit(1)
+    else:
+        port = int(os.environ.get('PORT', 5000))
+        app.run(host='0.0.0.0', port=port, debug=True)

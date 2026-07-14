@@ -1,5 +1,10 @@
+# Ignore all Excel files by default
 *.xlsx
-uploads/
+
+# Allow tracking Excel files inside the uploads folder for GitHub Actions triggers
+!uploads/*.xlsx
+
+# Ignore downloads and temporary caches
 downloads/
 __pycache__/
 .venv/
