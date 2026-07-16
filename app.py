@@ -408,7 +408,9 @@ def process_file_task(task_id, file_path):
         w_resolved = df['WRAP_UP_CODE'].astype(str).str.upper() == 'RESOLVED'
         eng_sur = df['ENGAGEMENT_TYPE'].astype(str).str.contains('SUR', case=False, na=False)
         not_unserved = df['session_reason'].astype(str).str.strip() != '未提供服務'
-        filtered_df = df[w_resolved & (~eng_sur) & not_unserved].copy()
+        not_excluded_sub1 = df['session_sub_reason'].astype(str).str.strip() != '服務內容相關問題'
+        not_excluded_sub2 = df['session_sub_reason'].astype(str).str.strip() != '個案外撥'
+        filtered_df = df[w_resolved & (~eng_sur) & not_unserved & not_excluded_sub1 & not_excluded_sub2].copy()
         
         total_cases = len(filtered_df)
         tasks[task_id]['total_cases'] = total_cases
@@ -454,38 +456,8 @@ def process_file_task(task_id, file_path):
             else:
                 nonsoluto_rows.append(row_data)
                 
-        tasks[task_id]['detail'] = "正在非同步搜尋參考資料中..."
-        
-        # Only search for SOLUTO cases!
+        # Web crawling is cancelled, keep all results empty
         soluto_results = [[]] * len(soluto_rows)
-        processed_count = 0
-        total_soluto = len(soluto_rows)
-        
-        if total_soluto > 0:
-            with ThreadPoolExecutor(max_workers=5) as executor:
-                future_to_idx = {
-                    executor.submit(
-                        get_search_results_with_fallback,
-                        row['次分類'],
-                        row['用戶問題'],
-                        row['問題說明']
-                    ): i for i, row in enumerate(soluto_rows)
-                }
-                for future in as_completed(future_to_idx):
-                    idx = future_to_idx[future]
-                    try:
-                        res = future.result()
-                        soluto_results[idx] = res
-                    except Exception as e:
-                        print(f"Soluto Row {idx} search failed: {e}")
-                        soluto_results[idx] = []
-                    
-                    processed_count += 1
-                    percent = 15 + int((processed_count / total_soluto) * 70)
-                    tasks[task_id]['progress'] = percent
-                    tasks[task_id]['detail'] = f"已完成搜尋: {processed_count}/{total_soluto} 筆案件..."
-        else:
-            tasks[task_id]['progress'] = 85
             
         # Non-SOLUTO cases get empty lists immediately without search!
         nonsoluto_results = [[]] * len(nonsoluto_rows)
@@ -617,7 +589,7 @@ def process_file_task(task_id, file_path):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_from_directory(BASE_DIR, 'index.html')
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
